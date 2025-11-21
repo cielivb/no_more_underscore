@@ -27,6 +27,7 @@ from tkinter import filedialog
 from tkinter import END
 from tkinter import INSERT
 import os
+import pyperclip
 
 
 ### Global variables --------------------------------------------------------
@@ -39,7 +40,7 @@ SELECTED_DIR = None # Will be of type string when set
 
 
 
-### GUI Logic ---------------------------------------------------------------
+### Core Logic ------------------------------------------------------------
 
 def get_filenames():
     """Retrieve filename list without extensions from selected directory"""
@@ -71,13 +72,20 @@ def run():
     for file in filenames:
         file = file.replace("_", " ")
         output = output + file + "\n"
-        
+    
+    OUT_FIELD.configure(state='normal')    
     OUT_FIELD.delete("1.0", END)
     OUT_FIELD.insert(INSERT, output)
+    OUT_FIELD.configure(state='disabled')
     
-    
-    
-    
+
+
+
+### GUI Bindings logic --------------------------------------------------
+
+def copy_output():
+    """Copies contents of OUT_FIELD widget to clipboard"""
+    pass
     
 
 
@@ -123,8 +131,11 @@ def create_main_window():
     header.grid(row=0, column=0)
     
     # Create output section
-    OUT_FIELD = scrolledtext.ScrolledText(ROOT, width=50, height=25)
-    DIR_LABEL = Label(ROOT, text='This is the directory label')
+    OUT_FIELD = scrolledtext.ScrolledText(ROOT, width=50, height=25, cursor="hand2")
+    OUT_FIELD.configure(state='disabled')
+    OUT_FIELD.bind("<Button-1>", copy_output)
+    OUT_FIELD.bind("<Button-2>", copy_output)
+    DIR_LABEL = Label(ROOT, text='Selected directory will appear here')
     OUT_FIELD.grid(row=1, column=0)
     DIR_LABEL.grid(row=2, column=0)
         
