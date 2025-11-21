@@ -14,20 +14,23 @@ e.g., 1987_dwyer_et_al_meaning_of_pluto.docx will be printed as
 
 ### Imports --------------------------------------------------------------
 
-from tkinter import Tk
-from tkinter import Menu
-from tkinter import Label
-from tkinter import Button
-from tkinter import Text
-from tkinter import Frame
-from tkinter import E
-from tkinter import W
-from tkinter import scrolledtext
-from tkinter import filedialog
-from tkinter import END
-from tkinter import INSERT
 import os
 import pyperclip
+
+from tkinter import Tk
+
+from tkinter import Button
+from tkinter import E
+from tkinter import END
+from tkinter import filedialog
+from tkinter import Frame
+from tkinter import INSERT
+from tkinter import Label
+from tkinter import Menu
+from tkinter import scrolledtext
+from tkinter import W
+from tkinter import Text
+
 
 
 ### Global variables --------------------------------------------------------
@@ -37,6 +40,7 @@ OUT_FIELD = None # Will be of type ScrolledText when set
 DIR_LABEL = None # Will be of type Label when set
 SELECTED_DIR = None # Will be of type string when set
 COPY_NOTICE = None # Will be of type Label when set
+
 
 
 
@@ -56,12 +60,14 @@ def get_filenames():
             out_list.append(".".join(file.split(".")[:-1]))  
     return out_list
 
+
 def select_dir():
     """Open file dialog for user to select desired directory"""
     global SELECTED_DIR
     global DIR_LABEL
     SELECTED_DIR = filedialog.askdirectory(title="Choose directory")
     DIR_LABEL.config(text=SELECTED_DIR)    
+
 
 def run():
     """Prompt user for directory and execute underscore replacement"""
@@ -82,18 +88,20 @@ def run():
 
 
 
-### GUI Bindings logic --------------------------------------------------
+### Copy output logic --------------------------------------------------
 
 def hide_copy_notice():
     """Make copy notice label the same colour as window background"""
     global COPY_NOTICE
     COPY_NOTICE.config(bg=ROOT.cget("bg"), fg=ROOT.cget("bg"))
     
+    
 def notify_copy():
     """Notify user by flashing 'Copied' when they copy output"""
     global COPY_NOTICE
     COPY_NOTICE.config(bg="green", fg="white")
     ROOT.after(2000, hide_copy_notice) # after 2000 ms (2 seconds)
+
 
 def copy_output(event):
     """Copies contents of OUT_FIELD widget to clipboard"""
@@ -103,32 +111,51 @@ def copy_output(event):
     
 
 
+
+
 ### GUI Structure -----------------------------------------------------------
 
 def create_menu_bar():
     global ROOT
+    
     menu_bar = Menu(ROOT)
     menu_bar.add_cascade(label='About', command=None)
     menu_bar.add_cascade(label='License', command=None) # COMMAND TO DO   
+    
     return menu_bar
+
 
 def create_header():
     global ROOT
     global COPY_NOTICE
+    
     header = Frame(pady=5)
     header.columnconfigure(0, weight=1)
     header.columnconfigure(1, weight=1)
     header.columnconfigure(2, weight=1)
     header.columnconfigure(3, weight=1)
+    
     Label(header, text='Select directory:').grid(row=0, column=0, sticky=W)
-    Button(header, text='Select', command=run).grid(row=0, column=1, sticky=W, padx=20)
+    
+    select_button = Button(header, text='Select', command=run)
+    select_button.grid(row=0, column=1, sticky=W, padx=20)
+    
     COPY_NOTICE = Label(header, text='Copied', width=10, 
                         bg=ROOT.cget("bg"), fg=ROOT.cget("bg"))
     COPY_NOTICE.grid(row=0, column=2, sticky=E, padx=20, columnspan=2)
+    
     return header
 
-def create_main_window():
 
+def create_output_field():
+    output_field = scrolledtext.ScrolledText(ROOT, width=50, height=25, cursor="hand2")
+    output_field.bind("<Button-1>", copy_output)
+    output_field.bind("<Button-3>", copy_output)
+    output_field.configure(state="disabled")
+    return output_field
+
+
+def create_main_window():
     global ROOT
     global OUT_FIELD
     global DIR_LABEL
@@ -137,28 +164,25 @@ def create_main_window():
     ROOT = Tk()
     ROOT.title("no more underscore")
     ROOT.geometry('500x500') # width x height of root window
-    
-    # Create menu bar
-    menu_bar = create_menu_bar()
-    ROOT.config(menu=menu_bar)
-    
-    # Configure column and row widths
     ROOT.columnconfigure(0, weight=1)
     ROOT.rowconfigure(0, weight=1, pad=1)
     ROOT.rowconfigure(1, weight=1, pad=1)
     ROOT.rowconfigure(2, weight=1, pad=1)
+    
+    # Create menu bar
+    menu_bar = create_menu_bar()
+    ROOT.config(menu=menu_bar)    
     
     # Create header section
     header = create_header()
     header.grid(row=0, column=0)
     
     # Create output section
-    OUT_FIELD = scrolledtext.ScrolledText(ROOT, width=50, height=25, cursor="hand2")
-    OUT_FIELD.configure(state='disabled')
-    OUT_FIELD.bind("<Button-1>", copy_output)
-    OUT_FIELD.bind("<Button-3>", copy_output)
-    DIR_LABEL = Label(ROOT, text='Selected directory will appear here')
+    OUT_FIELD = create_output_field()
     OUT_FIELD.grid(row=1, column=0)
+    
+    # Create directory label
+    DIR_LABEL = Label(ROOT, text='Selected directory will appear here')    
     DIR_LABEL.grid(row=2, column=0)
         
     ROOT.mainloop()
