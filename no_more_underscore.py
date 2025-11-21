@@ -23,22 +23,62 @@ from tkinter import Frame
 from tkinter import E
 from tkinter import W
 from tkinter import scrolledtext
+from tkinter import filedialog
+from tkinter import END
+from tkinter import INSERT
+import os
 
 
 ### Global variables --------------------------------------------------------
 
-ROOT = None
-OUT_FIELD = None
-DIR_LABEL = None
+ROOT = None # Will be of type Tk when set
+OUT_FIELD = None # Will be of type ScrolledText when set
+DIR_LABEL = None # Will be of type Label when set
+SELECTED_DIR = None # Will be of type string when set
 
 
 
 
 ### GUI Logic ---------------------------------------------------------------
 
+def get_filenames():
+    """Retrieve filename list without extensions from selected directory"""
+    global SELECTED_DIR
+    out_list = []
+    for file in os.listdir(SELECTED_DIR):
+        # Each file is of type string
+        # Folders are of format foldername (not followed by .extension)
+        # Files are of format filename.extension
+        # This program includes files only
+        if "." in file:
+            out_list.append(".".join(file.split(".")[:-1]))  
+    return out_list
 
+def select_dir():
+    """Open file dialog for user to select desired directory"""
+    global SELECTED_DIR
+    global DIR_LABEL
+    SELECTED_DIR = filedialog.askdirectory(title="Choose directory")
+    DIR_LABEL.config(text=SELECTED_DIR)    
 
-
+def run():
+    """Prompt user for directory and execute underscore replacement"""
+    global OUT_FILED
+    
+    select_dir()
+    filenames = get_filenames()
+    output = ""
+    for file in filenames:
+        file = file.replace("_", " ")
+        output = output + file + "\n"
+        
+    OUT_FIELD.delete("1.0", END)
+    OUT_FIELD.insert(INSERT, output)
+    
+    
+    
+    
+    
 
 
 ### GUI Structure -----------------------------------------------------------
@@ -54,12 +94,16 @@ def create_header():
     global ROOT
     header = Frame()
     Label(header, text='Select directory:').grid(row=0, column=0, sticky=W)
-    Button(header, text='Select', command=None).grid(row=0, column=1, sticky=E, padx=20)
+    Button(header, text='Select', command=run).grid(row=0, column=1, sticky=E, padx=20)
     return header
 
 def create_main_window():
-    # Create root window
+
     global ROOT
+    global OUT_FIELD
+    global DIR_LABEL
+    
+    # Create root window
     ROOT = Tk()
     ROOT.title("no more underscore")
     ROOT.geometry('500x500') # width x height of root window
