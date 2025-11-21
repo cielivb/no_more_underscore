@@ -36,6 +36,7 @@ ROOT = None # Will be of type Tk when set
 OUT_FIELD = None # Will be of type ScrolledText when set
 DIR_LABEL = None # Will be of type Label when set
 SELECTED_DIR = None # Will be of type string when set
+COPY_NOTICE = None # Will be of type Label when set
 
 
 
@@ -83,9 +84,22 @@ def run():
 
 ### GUI Bindings logic --------------------------------------------------
 
-def copy_output():
+def hide_copy_notice():
+    """Make copy notice label the same colour as window background"""
+    global COPY_NOTICE
+    COPY_NOTICE.config(bg=ROOT.cget("bg"), fg=ROOT.cget("bg"))
+    
+def notify_copy():
+    """Notify user by flashing 'Copied' when they copy output"""
+    global COPY_NOTICE
+    COPY_NOTICE.config(bg="green", fg="white")
+    ROOT.after(2000, hide_copy_notice) # after 2000 ms (2 seconds)
+
+def copy_output(event):
     """Copies contents of OUT_FIELD widget to clipboard"""
-    pass
+    global OUT_FIELD
+    pyperclip.copy(OUT_FIELD.get("1.0", END))
+    notify_copy()
     
 
 
@@ -100,9 +114,17 @@ def create_menu_bar():
 
 def create_header():
     global ROOT
-    header = Frame()
+    global COPY_NOTICE
+    header = Frame(pady=5)
+    header.columnconfigure(0, weight=1)
+    header.columnconfigure(1, weight=1)
+    header.columnconfigure(2, weight=1)
+    header.columnconfigure(3, weight=1)
     Label(header, text='Select directory:').grid(row=0, column=0, sticky=W)
-    Button(header, text='Select', command=run).grid(row=0, column=1, sticky=E, padx=20)
+    Button(header, text='Select', command=run).grid(row=0, column=1, sticky=W, padx=20)
+    COPY_NOTICE = Label(header, text='Copied', width=10, 
+                        bg=ROOT.cget("bg"), fg=ROOT.cget("bg"))
+    COPY_NOTICE.grid(row=0, column=2, sticky=E, padx=20, columnspan=2)
     return header
 
 def create_main_window():
@@ -134,7 +156,7 @@ def create_main_window():
     OUT_FIELD = scrolledtext.ScrolledText(ROOT, width=50, height=25, cursor="hand2")
     OUT_FIELD.configure(state='disabled')
     OUT_FIELD.bind("<Button-1>", copy_output)
-    OUT_FIELD.bind("<Button-2>", copy_output)
+    OUT_FIELD.bind("<Button-3>", copy_output)
     DIR_LABEL = Label(ROOT, text='Selected directory will appear here')
     OUT_FIELD.grid(row=1, column=0)
     DIR_LABEL.grid(row=2, column=0)
