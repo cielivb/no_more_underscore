@@ -90,6 +90,7 @@ def run():
 
 
 
+
 ### Copy output logic --------------------------------------------------
 
 def hide_copy_notice():
@@ -113,6 +114,8 @@ def copy_output(event):
     
 
 
+
+
 ### Menubar logic ------------------------------------------------------
 
 def open_about_window():
@@ -122,8 +125,25 @@ def open_about_window():
     about_info = Label(about_window, text=__doc__, pady=20, padx=20)
     about_info.pack()
 
+
 def open_license_window():
-    pass
+    # Get license contents
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    license_path = os.path.join(script_dir, 'LICENSE')
+    with open(license_path, 'r') as license_file:
+        content = license_file.read()
+        
+    # Create license window base
+    license_window = Toplevel()
+    license_window.title("no more underscore - License")
+    license_window.geometry("600x350")
+    
+    # Display license information
+    license_label = Label(license_window, text=content, pady=20, padx=20)
+    license_label.pack()
+    
+
+
 
 
 ### GUI Structure ------------------------------------------------------
@@ -199,6 +219,8 @@ def create_main_window():
     DIR_LABEL.grid(row=2, column=0)
         
     ROOT.mainloop()
+
+
 
 
 
