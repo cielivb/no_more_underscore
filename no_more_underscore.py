@@ -14,8 +14,9 @@ e.g., 1987_dwyer_et_al_meaning_of_pluto.docx will be printed as
 
 ### Imports ------------------------------------------------------------
 
-import os
-import pyperclip
+import os.path
+from os import listdir
+from pyperclip import copy
 
 from tkinter import Tk
 
@@ -43,6 +44,8 @@ DIR_LABEL = None # Will be of type Label when set
 SELECTED_DIR = None # Will be of type string when set
 COPY_NOTICE = None # Will be of type Label when set
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 
 
@@ -53,11 +56,12 @@ def get_filenames():
     """Retrieve filename list without extensions from selected directory"""
     global SELECTED_DIR
     out_list = []
-    for file in os.listdir(SELECTED_DIR):
+    for file in listdir(SELECTED_DIR):
         # Each file is of type string
         # Folders are of format foldername (not followed by .extension)
         # Files are of format filename.extension
         # This program includes files only
+        print(file)
         if "." in file:
             out_list.append(".".join(file.split(".")[:-1]))  
     return out_list
@@ -73,7 +77,7 @@ def select_dir():
 
 def run():
     """Prompt user for directory and execute underscore replacement"""
-    global OUT_FILED
+    global OUT_FIELD
     
     select_dir()
     filenames = get_filenames()
@@ -109,7 +113,7 @@ def notify_copy():
 def copy_output(event):
     """Copies contents of OUT_FIELD widget to clipboard"""
     global OUT_FIELD
-    pyperclip.copy(OUT_FIELD.get("1.0", END))
+    copy(OUT_FIELD.get("1.0", END))
     notify_copy()
     
 
@@ -119,8 +123,11 @@ def copy_output(event):
 ### Menubar logic ------------------------------------------------------
 
 def open_about_window():
+    global SCRIPT_DIR
     about_window = Toplevel()
     about_window.title("no more underscore - About")
+    about_window.iconbitmap(os.path.abspath(os.path.join(
+        SCRIPT_DIR, "images","icon.ico")))    
     about_window.geometry("420x200")
     about_info = Label(about_window, text=__doc__, pady=20, padx=20)
     about_info.pack()
@@ -128,14 +135,17 @@ def open_about_window():
 
 def open_license_window():
     # Get license contents
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    license_path = os.path.join(script_dir, 'LICENSE')
+    global SCRIPT_DIR
+    
+    license_path = os.path.abspath(os.path.join(SCRIPT_DIR, 'LICENSE'))
     with open(license_path, 'r') as license_file:
         content = license_file.read()
         
     # Create license window base
     license_window = Toplevel()
     license_window.title("no more underscore - License")
+    license_window.iconbitmap(os.path.abspath(os.path.join(
+        SCRIPT_DIR, "images","icon.ico")))
     license_window.geometry("600x350")
     
     # Display license information
@@ -192,11 +202,14 @@ def create_main_window():
     global ROOT
     global OUT_FIELD
     global DIR_LABEL
+    global SCRIPT_DIR
     
     # Create root window
     ROOT = Tk()
     ROOT.title("no more underscore")
     ROOT.geometry('500x500') # width x height of root window
+    ROOT.iconbitmap(os.path.abspath(os.path.join(
+        SCRIPT_DIR, "images","icon.ico")))
     ROOT.columnconfigure(0, weight=1)
     ROOT.rowconfigure(0, weight=1, pad=1)
     ROOT.rowconfigure(1, weight=1, pad=1)
