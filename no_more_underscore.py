@@ -12,7 +12,7 @@ e.g., 1987_dwyer_et_al_meaning_of_pluto.docx will be printed as
 """
 
 
-### Imports --------------------------------------------------------------
+### Imports ------------------------------------------------------------
 
 import os
 import pyperclip
@@ -30,10 +30,12 @@ from tkinter import Menu
 from tkinter import scrolledtext
 from tkinter import W
 from tkinter import Text
+from tkinter import Toplevel
+from tkinter import ttk
 
 
 
-### Global variables --------------------------------------------------------
+### Global variables ---------------------------------------------------
 
 ROOT = None # Will be of type Tk when set
 OUT_FIELD = None # Will be of type ScrolledText when set
@@ -45,7 +47,7 @@ COPY_NOTICE = None # Will be of type Label when set
 
 
 
-### Core Logic ------------------------------------------------------------
+### Core Logic ---------------------------------------------------------
 
 def get_filenames():
     """Retrieve filename list without extensions from selected directory"""
@@ -111,16 +113,27 @@ def copy_output(event):
     
 
 
+### Menubar logic ------------------------------------------------------
+
+def open_about_window():
+    about_window = Toplevel()
+    about_window.title("no more underscore - About")
+    about_window.geometry("420x200")
+    about_info = Label(about_window, text=__doc__, pady=20, padx=20)
+    about_info.pack()
+
+def open_license_window():
+    pass
 
 
-### GUI Structure -----------------------------------------------------------
+### GUI Structure ------------------------------------------------------
 
 def create_menu_bar():
     global ROOT
     
     menu_bar = Menu(ROOT)
-    menu_bar.add_cascade(label='About', command=None)
-    menu_bar.add_cascade(label='License', command=None) # COMMAND TO DO   
+    menu_bar.add_cascade(label='About', command=open_about_window)
+    menu_bar.add_cascade(label='License', command=open_license_window)
     
     return menu_bar
 
@@ -188,7 +201,9 @@ def create_main_window():
     ROOT.mainloop()
 
 
-### Main loop ---------------------------------------------------------------
+
+
+### Main loop ----------------------------------------------------------
 
 if __name__ == "__main__":
     create_main_window()
