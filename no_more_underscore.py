@@ -11,6 +11,9 @@ e.g., 1987_dwyer_et_al_meaning_of_pluto.docx will be printed as
    
 """
 
+
+### Imports --------------------------------------------------------------
+
 from tkinter import Tk
 from tkinter import Menu
 from tkinter import Label
@@ -22,8 +25,13 @@ from tkinter import W
 from tkinter import scrolledtext
 
 
+### Global variables --------------------------------------------------------
 
 ROOT = None
+OUT_FIELD = None
+DIR_LABEL = None
+
+
 
 
 ### GUI Logic ---------------------------------------------------------------
@@ -35,13 +43,19 @@ ROOT = None
 
 ### GUI Structure -----------------------------------------------------------
 
+def create_menu_bar():
+    global ROOT
+    menu_bar = Menu(ROOT)
+    menu_bar.add_cascade(label='About', command=None)
+    menu_bar.add_cascade(label='License', command=None) # COMMAND TO DO   
+    return menu_bar
+
 def create_header():
     global ROOT
     header = Frame()
     Label(header, text='Select directory:').grid(row=0, column=0, sticky=W)
     Button(header, text='Select', command=None).grid(row=0, column=1, sticky=E, padx=20)
     return header
-
 
 def create_main_window():
     # Create root window
@@ -51,9 +65,7 @@ def create_main_window():
     ROOT.geometry('500x500') # width x height of root window
     
     # Create menu bar
-    menu_bar = Menu(ROOT)
-    menu_bar.add_cascade(label='About', command=None)
-    menu_bar.add_cascade(label='License', command=None) # COMMAND TO DO
+    menu_bar = create_menu_bar()
     ROOT.config(menu=menu_bar)
     
     # Configure column and row widths
@@ -67,13 +79,12 @@ def create_main_window():
     header.grid(row=0, column=0)
     
     # Create output section
-    out_field = scrolledtext.ScrolledText(ROOT, width=50, height=25)
-    dir_label = Label(ROOT, text='This is the directory label')
-    out_field.grid(row=1, column=0)
-    dir_label.grid(row=2, column=0)
-    
+    OUT_FIELD = scrolledtext.ScrolledText(ROOT, width=50, height=25)
+    DIR_LABEL = Label(ROOT, text='This is the directory label')
+    OUT_FIELD.grid(row=1, column=0)
+    DIR_LABEL.grid(row=2, column=0)
+        
     ROOT.mainloop()
-
 
 
 ### Main loop ---------------------------------------------------------------
